@@ -28,7 +28,7 @@ int getTime() {
         Serial.println(thermistor(analogRead(0)));
       } 
      else if (c == '!') {
-        Serial.println(21.00);
+        Serial.println(21.00); // Place holder for 2nd thermistor
       } else {
         in += c;
       }

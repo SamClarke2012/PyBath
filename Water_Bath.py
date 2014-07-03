@@ -16,11 +16,19 @@ class PID:
     """ PID control class.
     """
     def __init__(self):
+
+        # Gain variables
         self.Kp = 0
         self.Kd = 0
         self.Ki = 0
-
-        self.Initialize()
+        self.prev_err = 0
+        # Result variables
+        self.Cp = 0
+        self.Ci = 0
+        self.Cd = 0
+        # initialize delta t variables
+        self.currtm = time.time()
+        self.prevtm = self.currtm
 
     def setKp(self, invar):
         """ Set proportional gain. """
@@ -37,19 +45,6 @@ class PID:
     def setPrevErr(self, preverr):
         """ Set previous error value. """
         self.prev_err = preverr
-
-    def Initialize(self):
-        # initialize delta t variables
-        self.currtm = time.time()
-        self.prevtm = self.currtm
-
-        self.prev_err = 0
-
-        # term result variables
-        self.Cp = 0
-        self.Ci = 0
-        self.Cd = 0
-
 
     def genOut(self, error):
         """ Performs a PID computation and returns a control value based on
@@ -90,6 +85,9 @@ class PID:
             (m^2) of the tank.
         """
         return e*0.000000056703*a*((t**4)-(c**4))
+
+
+
 
 def getTemp( c ):
     """ Returns requested data from hardware controller """
@@ -160,10 +158,9 @@ while True:
     out = p.genOut(setPoint - invars)
     # Convert it from ideal total K-joules to Watt/seconds
     t = p.outputHandler(out, watts)
-    # Convert that to a step from our current energy state
+    # Convert that to element on-time (seconds)
     step = t - prev
     # Handle cooling and overshoot
-    #if bathTemp > setTemp or step < 0 : step = 0.0
     if bathTemp - setTemp > 0.1 or step < 0 : step = 0.0
     # Save the current energy state
     prev = t 
